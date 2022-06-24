@@ -1,6 +1,8 @@
+import sqlalchemy
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_
+from sqlalchemy.sql.expression import cast
 import requests
 import json
 
@@ -40,26 +42,19 @@ def get_books():
         filters.append(Book.title.ilike(f'%{request.args.get("title")}%')) # ilike - case insensitive
     if request.args.get('author') is not None:
         filters.append(Book.authors.ilike(f'%{request.args.get("author")}%'))
-    # filtrowanie nie działa poprawnie dla wartości np. 200 (filtr uznaje że 200 > 1960)????
-    # if request.args.get('from') is not None:
-    #     filters.append(Book.published_year >= request.args.get('from'))
-    # if request.args.get('to') is not None:
-    #     filters.append(Book.published_year <= request.args.get('to'))
+    if request.args.get('from') is not None:
+        filters.append(cast(Book.published_year, sqlalchemy.Integer) >= int(request.args.get('from')))
+    if request.args.get('to') is not None:
+        filters.append(cast(Book.published_year, sqlalchemy.Integer) <= int(request.args.get('to')))
     if request.args.get('acquired') is not None:
         if request.args.get('acquired').lower() == 'false':
             filters.append(Book.acquired == False)
         elif request.args.get('acquired').lower() == 'true':
             filters.append(Book.acquired == True)
-
-    books = Book.query.filter(and_(*filters)).all()
     output = []
+    books = Book.query.filter(and_(*filters)).all()
+
     for book in books:
-        if request.args.get('from') is not None:
-            if int(book.published_year) < int(request.args.get('from')):
-                continue
-        if request.args.get('to') is not None:
-            if int(book.published_year) > int(request.args.get('to')):
-                continue
         book_data = {'id': book.id,
                      'external_id': book.external_id,
                      'title': book.title,
@@ -205,7 +200,6 @@ def get_data_from_googleapis(nazwisko):
 
 # deployment
 # github
-
 
 if __name__ == '__main__':
     app.run()
