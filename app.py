@@ -37,7 +37,7 @@ def api_spec():
 def get_books():
     filters = []
     if request.args.get('title') is not None:
-        filters.append(Book.title.ilike(f'%{request.args.get("title")}%'))
+        filters.append(Book.title.ilike(f'%{request.args.get("title")}%')) # ilike - case insensitive
     if request.args.get('author') is not None:
         filters.append(Book.authors.ilike(f'%{request.args.get("author")}%'))
     # niektóre dane published_year mają postąc ze znakiem ? - filtr nie działa poprawnie na te pozycje
@@ -181,7 +181,8 @@ def get_data_from_googleapis(nazwisko):
                 item_index += 1
                 continue
             if 'publishedDate' in data['volumeInfo'].keys():
-                book_data['published_year'] = data['volumeInfo']['publishedDate'][:4]
+                if data['volumeInfo']['publishedDate'][:4].isdigit():
+                    book_data['published_year'] = data['volumeInfo']['publishedDate'][:4]
             else:
                 book_data['published_year'] = None
             if 'imageLinks' in data['volumeInfo'].keys():
