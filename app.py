@@ -203,7 +203,7 @@ def get_data_from_googleapis(nazwisko):
             else:
                 book_data['thumbnail'] = None
             books_data.append(book_data)
-            print(item_index, book_data)
+            # print(item_index, book_data)
 
             item_index += 1
     return books_data
