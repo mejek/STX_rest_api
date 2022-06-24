@@ -40,11 +40,11 @@ def get_books():
         filters.append(Book.title.ilike(f'%{request.args.get("title")}%')) # ilike - case insensitive
     if request.args.get('author') is not None:
         filters.append(Book.authors.ilike(f'%{request.args.get("author")}%'))
-    # niektóre dane published_year mają postąc ze znakiem ? - filtr nie działa poprawnie na te pozycje
-    if request.args.get('From') is not None:
-        filters.append(Book.published_year >= str(request.args.get('From')))
-    if request.args.get('to') is not None:
-        filters.append(Book.published_year <= str(request.args.get('to')))
+    # filtrowanie nie działa poprawnie dla wartości np. 200 (filtr uznaje że 200 > 1960)????
+    # if request.args.get('from') is not None:
+    #     filters.append(Book.published_year >= request.args.get('from'))
+    # if request.args.get('to') is not None:
+    #     filters.append(Book.published_year <= request.args.get('to'))
     if request.args.get('acquired') is not None:
         if request.args.get('acquired').lower() == 'false':
             filters.append(Book.acquired == False)
@@ -54,6 +54,12 @@ def get_books():
     books = Book.query.filter(and_(*filters)).all()
     output = []
     for book in books:
+        if request.args.get('from') is not None:
+            if int(book.published_year) < int(request.args.get('from')):
+                continue
+        if request.args.get('to') is not None:
+            if int(book.published_year) > int(request.args.get('to')):
+                continue
         book_data = {'id': book.id,
                      'external_id': book.external_id,
                      'title': book.title,
