@@ -10,7 +10,7 @@ app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cz_books.db'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://vnuktceybqbfou:20467ae50504e401004dacdd3234af2eb248edccfaa07fd2' \
                                         'c9c953f522489e06@ec2-44-205-41-76.compute-1.amazonaws.com:5432/d9hcm5cnhp6dl4'
-app.config['JSON_SORT_KEYS'] = False  # wyświetlanie wyniku zgodnie z kolejnością kolumn w bazie
+app.config['JSON_SORT_KEYS'] = False  # wyświetlanie wyniku dla ksiązki json zgodnie z kolejnością kolumn w bazie
 db = SQLAlchemy(app)
 
 
@@ -53,9 +53,9 @@ def get_books():
             filters.append(Book.acquired == True)
     output = []
     if filters != []:
-        books = Book.query.filter(and_(*filters)).all()
+        books = Book.query.filter(and_(*filters)).order_by(Book.id).all()
     else:
-        books = Book.query.all()
+        books = Book.query.order_by(Book.id).all()
 
     for book in books:
         book_data = {'id': book.id,
@@ -208,8 +208,6 @@ def get_data_from_googleapis(nazwisko):
             item_index += 1
     return books_data
 
-# deployment
-# github
 
 if __name__ == '__main__':
     app.run()
