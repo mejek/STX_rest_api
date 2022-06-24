@@ -92,7 +92,10 @@ def update_book(book_id):
     updated_arguments = request.json.keys()
 
     for arg in updated_arguments:
-        Book.query.filter(Book.id == book_id).update({arg: request.json[arg]})
+        if arg == 'authors':
+            Book.query.filter(Book.id == book_id).update({arg: json.dumps(request.json[arg])})
+        else:
+            Book.query.filter(Book.id == book_id).update({arg: request.json[arg]})
     db.session.commit()
 
     return get_book(book_id)
