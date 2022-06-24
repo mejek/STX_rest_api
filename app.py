@@ -37,9 +37,9 @@ def api_spec():
 def get_books():
     filters = []
     if request.args.get('title') is not None:
-        filters.append(Book.title.like(f'%{request.args.get("title")}%'))
+        filters.append(Book.title.ilike(f'%{request.args.get("title")}%'))
     if request.args.get('author') is not None:
-        filters.append(Book.authors.like(f'%{request.args.get("author")}%'))
+        filters.append(Book.authors.ilike(f'%{request.args.get("author")}%'))
     # niektóre dane published_year mają postąc ze znakiem ? - filtr nie działa poprawnie na te pozycje
     if request.args.get('From') is not None:
         filters.append(Book.published_year >= str(request.args.get('From')))
