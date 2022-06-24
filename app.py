@@ -7,9 +7,9 @@ import requests
 import json
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cz_books.db'
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://vnuktceybqbfou:20467ae50504e401004dacdd3234af2eb248edccfaa07fd2' \
-#                                         'c9c953f522489e06@ec2-44-205-41-76.compute-1.amazonaws.com:5432/d9hcm5cnhp6dl4'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cz_books.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://vnuktceybqbfou:20467ae50504e401004dacdd3234af2eb248edccfaa07fd2' \
+                                        'c9c953f522489e06@ec2-44-205-41-76.compute-1.amazonaws.com:5432/d9hcm5cnhp6dl4'
 app.config['JSON_SORT_KEYS'] = False  # wyświetlanie wyniku zgodnie z kolejnością kolumn w bazie
 db = SQLAlchemy(app)
 
@@ -181,7 +181,11 @@ def get_data_from_googleapis(nazwisko):
         for data in respond.json()['items']:
             book_data = {}  # dane książki do importu do bazy
             book_data['external_id'] = data['id']
-            book_data['title'] = data['volumeInfo']['title']
+            if 'title' in data['volumeInfo'].keys():
+                book_data['title'] = data['volumeInfo']['title']
+            else:
+                item_index += 1
+                continue
             if 'authors' in data['volumeInfo'].keys():
                 book_data['authors'] = data['volumeInfo']['authors']
             else:
