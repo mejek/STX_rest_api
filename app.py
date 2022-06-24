@@ -52,7 +52,10 @@ def get_books():
         elif request.args.get('acquired').lower() == 'true':
             filters.append(Book.acquired == True)
     output = []
-    books = Book.query.filter(and_(*filters)).all()
+    if filters != []
+        books = Book.query.filter(and_(*filters)).all()
+    else:
+        books = Book.query.all()
 
     for book in books:
         book_data = {'id': book.id,
