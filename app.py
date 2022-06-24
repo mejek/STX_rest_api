@@ -65,7 +65,6 @@ def get_books():
                      'acquired': book.acquired,
                      'published_year': book.published_year,
                      'thumbnail': book.thumbnail}
-        output.append(book_data)
     return jsonify(output)
 
 
