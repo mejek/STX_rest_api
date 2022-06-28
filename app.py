@@ -5,11 +5,11 @@ from sqlalchemy import and_
 from sqlalchemy.sql.expression import cast
 import requests
 import json
+import database
 
 app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cz_books.db'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://vnuktceybqbfou:20467ae50504e401004dacdd3234af2eb248edccfaa07fd2' \
-                                        'c9c953f522489e06@ec2-44-205-41-76.compute-1.amazonaws.com:5432/d9hcm5cnhp6dl4'
+app.config['SQLALCHEMY_DATABASE_URI'] = database.DATABASE_URL #link do bazy danych na heroku ukryty w pliku
 app.config['JSON_SORT_KEYS'] = False  # wyświetlanie wyniku dla ksiązki json zgodnie z kolejnością kolumn w bazie
 db = SQLAlchemy(app)
 
@@ -39,7 +39,7 @@ def api_spec():
 def get_books():
     filters = []
     if request.args.get('title') is not None:
-        filters.append(Book.title.ilike(f'%{request.args.get("title")}%')) # ilike - case insensitive
+        filters.append(Book.title.ilike(f'%{request.args.get("title")}%'))  # ilike - case insensitive
     if request.args.get('author') is not None:
         filters.append(Book.authors.ilike(f'%{request.args.get("author")}%'))
     if request.args.get('from') is not None:
@@ -208,6 +208,6 @@ def get_data_from_googleapis(nazwisko):
             item_index += 1
     return books_data
 
-
 if __name__ == '__main__':
     app.run()
+
